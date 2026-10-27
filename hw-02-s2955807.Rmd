@@ -34,43 +34,72 @@ When you fill the missing part, remove the # symbol before running the code chun
 
 ```{r ex1a, out.width="80%", eval=FALSE}
 data_5k_10k %>% 
-  # filter(______) %>%
+  filter(gender=="M") %>%
   filter(!is.na(average.heart.rate..bpm.)) %>%
-  # ggplot(aes(x = __________)) + 
+  ggplot(aes(x = average.heart.rate..bpm.)) + 
+  geom_histogram(bins = 20)
+```
+
+Histogram shape: high in the middle and low on both sides, it's approximately normally diatributed, because mean = 147.9444	 , median = 147.9.
+Distribution characteristics: the average running heart rate of male students is mainly concentrated between 137.5 bpm and 162.5 bpm.
+
+```{r}
+data_5k_10k %>% 
+   filter(gender=="M") %>%
+   filter(!is.na(average.heart.rate..bpm.)) %>% summarise(mean_M_hr=mean(average.heart.rate..bpm.))
+```
+```{r}
+data_5k_10k %>% 
+    filter(gender=="M") %>%
+    filter(!is.na(average.heart.rate..bpm.)) %>% summarise(median_M_hr=median(average.heart.rate..bpm.))
+
+```
+
+```{r ex1b, out.width="80%"}
+# Write your code for Ex1b here
+data_5k_10k %>% 
+  filter(gender=="F") %>%
+  filter(!is.na(average.heart.rate..bpm.)) %>%
+  ggplot(aes(x = average.heart.rate..bpm.)) + 
   geom_histogram(bins = 20)
 ```
 
 
-_Write your text to answer exercise 1a here (Please delete this message before submission!)_
-
-
-```{r ex1b, out.width="80%"}
-# Write your code for Ex1b here
 
 
 
 
 
+
+Histogram shape: Most people's heart rates are concentrated in the middle range, showing a pattern of high in the middle and low on both sides, and showing left skew, because mean=156, median=156.7 (mean<median).
+Difference from male runners: Female runners' heart rates are concentrated in the ranges of 138-151 bpm and 156-172, with overall higher average heart rates.
+```{r}
+data_5k_10k %>% 
+   filter(gender=="F") %>%
+   filter(!is.na(average.heart.rate..bpm.)) %>% summarise(mean_M_hr=mean(average.heart.rate..bpm.))
 ```
 
+```{r}
+data_5k_10k %>% 
+    filter(gender=="F") %>%
+    filter(!is.na(average.heart.rate..bpm.)) %>% summarise(median_M_hr=median(average.heart.rate..bpm.))
+```
 
-_Write your text to answer exercise 1b here (Please delete this message before submission!)_
 
 
 ## Exercise 2
 
 ```{r ex2, out.width = "80%"}
 # Write your code to answer exercise 2a here
-
-
+data_5k_10k %>%
+ mutate(pace_min_per_km=elapsed.time..s./60/(distance..m./1000)) %>% filter(!is.na(pace_min_per_km)) %>% filter(!is.na(gender)) %>%    ggplot(mapping=aes(x=event,y=pace_min_per_km))+     geom_boxplot()+facet_wrap(~gender,nrow=1)+
+labs(title="Pace(min/km) comparison for 5k and 10k runs,by gebder", x="Race distance",y="Pace(min/km)")
 
 
 ```
 
-_Write your text to answer exercise 2b here (Please delete this message before submission!)_
 
-
-
+Regardless of gender, the pace for running 10 km is always greater than for 5 km; for the same distance, men's pace is faster than women's.
 
 ## Exercise 3
 
