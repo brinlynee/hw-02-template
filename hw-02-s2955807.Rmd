@@ -106,31 +106,90 @@ Regardless of gender, the pace for running 10 km is always greater than for 5 km
 ```{r ex3, out.width = "80%"}
 # Write your code to answer exercise 3 here
 
+plot_data <- strava_runs %>%
+   mutate(speed = distance..m. / elapsed.time..s.) %>%
+  group_by(athlete) %>%
+  mutate(avg_distance_km = mean(distance..m. / 1000, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    runner_group = case_when(
+      avg_distance_km > 13 ~ "Long-distance runners",
+      avg_distance_km < 7  ~ "Short-distance runners",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(runner_group),
+         !is.na(speed),
+         !is.na(distance..m.)) %>%
+  mutate(distance_km = distance..m. / 1000)
 
-
+ggplot(plot_data, aes(x = distance_km, y = speed, colour = runner_group)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  scale_colour_manual(values = c(
+    "Long-distance runners"  = "orange",
+    "Short-distance runners" = "forestgreen"))+
+    
+ 
+    
+  labs(title="Speed vs Distance for Long- and Short-Distance Runners", subtitle="Grouped by runners' average distance: >13 km vs <7 km",
+    x = "Run distance (km)",
+    y = "Run average speed (m/s)",
+    colour = "Runner group"
+  ) +
+  theme_minimal()+ theme(legend.position = "bottom",legend.background = element_blank(),
+    legend.key = element_blank(),legend.text = element_text(size = 11),legend.title = element_blank(),legend.key.width = unit(1.5, "cm"))+
+    guides(colour = guide_legend(override.aes = list(size = 3, alpha = 1)))
 
 
 ```
 
 
-_Write your text to answer exercise 3b here (Please delete this message before submission!)_
 
 
+Based on the generated scatter plot, the hypothesis is supported: the paces of long-distance and short-distance runners are indeed different. The orange points (long-distance runners) are generally positioned higher (faster speed) and extend to the right (longer distance), while the green points (short-distance runners) are positioned lower (slower speed) and clustered to the left (shorter distance).
 ## Exercise 4
 
 ```{r ex4, out.width = "80%"}
 # Write your code to answer exercise 4 here
 
-
-
+summary_data <- strava_runs %>%
+  filter(!is.na(gender)) %>%  # 移除性别缺失值
+  group_by(gender) %>%
+  summarise(
+    mean_distance_km = mean(distance..m. / 1000, na.rm = TRUE),
+    mean_elapsed_min = mean(elapsed.time..s. / 60, na.rm = TRUE)
+  )
+plot_data <- summary_data %>%
+  pivot_longer(
+    cols = c(mean_distance_km, mean_elapsed_min),
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  
+mutate(
+    metric = factor(metric, 
+                    levels = c("mean_distance_km", "mean_elapsed_min"),
+                    labels = c("Mean Distance (km)", "Mean Elapsed Time (mins)"))
+  )
+ggplot(plot_data, aes(x = gender, y = value, fill = gender)) +
+  geom_col(width = 0.6) +
+  facet_wrap(~ metric, scales = "free_y") +labs(
+    x = "Gender",
+    y = NULL,
+    fill = "Gender"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(size = 12, face = "bold"))
 
 
 ```
 
 
-_Write your text to answer exercise 4b here (Please delete this message before submission!)_
 
 
+The faceted bar charts reveal a clear gender difference in running habits. Male runners exhibit higher average values in both metrics: they run longer distances and spend more elapsed time per activity compared to female runners. The increase in elapsed time is consistent with the greater distance covered, reflecting that males generally log longer, more time-consuming runs in this dataset.
 
 
 
